@@ -34,3 +34,21 @@ cd src-tauri
 cargo build --release
 ```
 *(or `npm run build` from the project root to create the installer package)*
+
+---
+
+## 📦 Automated Multi-Platform Releases (GitHub Actions)
+
+A GitHub Actions workflow is included at [`.github/workflows/release.yml`](.github/workflows/release.yml).
+
+* **Trigger manually**: From your GitHub repo's **Actions** tab → **Release & Build Artifacts** → **Run workflow**.
+* **Create a tagged release**: Push a version tag:
+  ```powershell
+  git tag v0.1.0
+  git push origin v0.1.0
+  ```
+The workflow will compile and publish release binaries for:
+- **Windows**: `yt-music.exe`, `.msi`, `.exe` (NSIS)
+- **Linux**: `.deb`, `.AppImage`
+- **macOS**: `.dmg`, `.app` (Universal Apple Silicon & Intel)
+
