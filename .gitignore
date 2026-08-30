@@ -1,0 +1,47 @@
+# Rust & Cargo build outputs (all release/debug intermediate files and binaries)
+/src-tauri/target/
+**/target/
+
+# Tauri generated files
+/src-tauri/gen/schemas/
+
+# Node & Package Managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Compiled Binaries & Installers
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+*.msi
+*.deb
+*.app
+*.dmg
+*.pdb
+
+# IDE & Editor Settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
