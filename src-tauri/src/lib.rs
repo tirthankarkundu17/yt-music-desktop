@@ -1,14 +1,34 @@
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager,
+    webview::WebviewWindowBuilder,
+    Manager, WebviewUrl,
 };
+
+const ADBLOCK_SCRIPT: &str = include_str!("adblock.js");
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
+            // Build the main window with adblocker initialization script
+            let window = WebviewWindowBuilder::new(
+                app,
+                "main",
+                WebviewUrl::External("https://music.youtube.com".parse().expect("valid URL")),
+            )
+            .title("YouTube Music")
+            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+            .inner_size(1280.0, 820.0)
+            .min_inner_size(800.0, 600.0)
+            .resizable(true)
+            .fullscreen(false)
+            .center()
+            .decorations(true)
+            .initialization_script(ADBLOCK_SCRIPT)
+            .build()?;
+
             // Build system tray menu items
             let quit_i = MenuItem::with_id(app, "quit", "Quit YouTube Music", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Show / Focus Window", true, None::<&str>)?;
@@ -56,15 +76,13 @@ pub fn run() {
                 .build(app)?;
 
             // Close-to-tray handling: keep music playing when window is closed
-            if let Some(window) = app.get_webview_window("main") {
-                let window_clone = window.clone();
-                window.on_window_event(move |event| {
-                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                        api.prevent_close();
-                        let _ = window_clone.hide();
-                    }
-                });
-            }
+            let window_clone = window.clone();
+            window.on_window_event(move |event| {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    let _ = window_clone.hide();
+                }
+            });
 
             Ok(())
         })
