@@ -1,6 +1,6 @@
 {
   "name": "yt-music-tauri",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "Lightweight YouTube Music Desktop Client",
   "private": true,
   "scripts": {
