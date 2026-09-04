@@ -163,7 +163,6 @@
 
     // 1. Drop blocked ad/telemetry domains
     if (isBlockedUrl(url)) {
-      console.log('%c[uBlock Engine] 🚫 Blocked ad network request:', 'color: #ff5252; font-weight: bold;', url);
       incrementBlockedCount();
       return new Response(JSON.stringify({ blocked: true }), {
         status: 200,
@@ -184,7 +183,6 @@
         data = pruneAdData(data);
 
         if (hadAdPlacements) {
-          console.log('%c[uBlock Engine] 🛡️ Pruned adPlacements & adSlots from player response:', 'color: #4caf50; font-weight: bold;', url);
           incrementBlockedCount();
         }
 
@@ -214,7 +212,6 @@
 
   OriginalXHR.prototype.send = function (...args) {
     if (this._url && isBlockedUrl(this._url)) {
-      console.log('%c[uBlock Engine] 🚫 Blocked XHR ad network request:', 'color: #ff5252; font-weight: bold;', this._url);
       incrementBlockedCount();
       Object.defineProperty(this, 'status', { get: () => 200 });
       Object.defineProperty(this, 'readyState', { get: () => 4 });
@@ -236,7 +233,6 @@
             const hadAds = Boolean(data.adPlacements || data.adSlots || data.playerAds);
             data = pruneAdData(data);
             if (hadAds) {
-              console.log('%c[uBlock Engine] 🛡️ Pruned XHR player ads payload:', 'color: #4caf50; font-weight: bold;', this._url);
               incrementBlockedCount();
             }
             const sanitizedText = JSON.stringify(data);
@@ -260,7 +256,6 @@
           const hadAds = Boolean(val.adPlacements || val.adSlots || val.playerAds);
           _ytInitialPlayerResponse = pruneAdData(val);
           if (hadAds) {
-            console.log('%c[uBlock Engine] 🛡️ Pruned ytInitialPlayerResponse ads payload', 'color: #4caf50; font-weight: bold;');
             incrementBlockedCount();
           }
         } else {
@@ -500,7 +495,6 @@
       shadow.appendChild(badgeElem);
       root.appendChild(host);
       updateBadgePosition();
-      console.log('%c[uBlock Engine] 🛡️ Shadow DOM Badge attached to documentElement', 'color: #4caf50; font-weight: bold;');
     } else if (!root.contains(host)) {
       root.appendChild(host);
       updateBadgePosition();
