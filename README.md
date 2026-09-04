@@ -46,9 +46,9 @@ Grab the latest prebuilt binaries from [Releases](https://github.com/tirthankark
 
 | Platform | Formats / Installers |
 | :--- | :--- |
-| **Windows** | `.exe` (NSIS Installer), `.msi` (Windows Installer), portable `.exe` |
+| **Windows (x86_64 & ARM64)** | `.exe` (NSIS Installer), `.msi` (x86_64), standalone `.exe` |
 | **macOS** | `.dmg`, `.app` (Universal Apple Silicon `arm64` & Intel `x86_64`) |
-| **Linux** | `.AppImage`, `.deb` (Debian / Ubuntu) |
+| **Linux (x86_64 & ARM64)** | `.AppImage`, `.deb` (Debian / Ubuntu), standalone executable |
 
 ---
 

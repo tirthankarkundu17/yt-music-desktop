@@ -53,6 +53,30 @@
     }
   }
 
+  function updateBadgePosition() {
+    const host = document.getElementById('ytm-ublock-host');
+    if (!host || !host.shadowRoot) return;
+    const badge = host.shadowRoot.getElementById('badge');
+    if (!badge) return;
+
+    // Dynamically align badge to the left of YouTube Music's right controls (profile avatar, cast button, sign-in button)
+    const rightContent =
+      document.querySelector('ytmusic-nav-bar #right-content') ||
+      document.querySelector('#right-content') ||
+      document.querySelector('ytmusic-settings-button') ||
+      document.querySelector('ytmusic-sign-in-button');
+
+    if (rightContent) {
+      const rect = rightContent.getBoundingClientRect();
+      if (rect.left > 0 && rect.left < window.innerWidth) {
+        const computedRight = Math.max(130, Math.round(window.innerWidth - rect.left + 16));
+        badge.style.right = `${computedRight}px`;
+        return;
+      }
+    }
+    badge.style.right = '130px';
+  }
+
   function triggerBadgePulse() {
     const host = document.getElementById('ytm-ublock-host');
     if (host && host.shadowRoot) {
@@ -139,7 +163,6 @@
 
     // 1. Drop blocked ad/telemetry domains
     if (isBlockedUrl(url)) {
-      console.log('%c[uBlock Engine] 🚫 Blocked ad network request:', 'color: #ff5252; font-weight: bold;', url);
       incrementBlockedCount();
       return new Response(JSON.stringify({ blocked: true }), {
         status: 200,
@@ -160,7 +183,6 @@
         data = pruneAdData(data);
 
         if (hadAdPlacements) {
-          console.log('%c[uBlock Engine] 🛡️ Pruned adPlacements & adSlots from player response:', 'color: #4caf50; font-weight: bold;', url);
           incrementBlockedCount();
         }
 
@@ -190,7 +212,6 @@
 
   OriginalXHR.prototype.send = function (...args) {
     if (this._url && isBlockedUrl(this._url)) {
-      console.log('%c[uBlock Engine] 🚫 Blocked XHR ad network request:', 'color: #ff5252; font-weight: bold;', this._url);
       incrementBlockedCount();
       Object.defineProperty(this, 'status', { get: () => 200 });
       Object.defineProperty(this, 'readyState', { get: () => 4 });
@@ -212,7 +233,6 @@
             const hadAds = Boolean(data.adPlacements || data.adSlots || data.playerAds);
             data = pruneAdData(data);
             if (hadAds) {
-              console.log('%c[uBlock Engine] 🛡️ Pruned XHR player ads payload:', 'color: #4caf50; font-weight: bold;', this._url);
               incrementBlockedCount();
             }
             const sanitizedText = JSON.stringify(data);
@@ -236,7 +256,6 @@
           const hadAds = Boolean(val.adPlacements || val.adSlots || val.playerAds);
           _ytInitialPlayerResponse = pruneAdData(val);
           if (hadAds) {
-            console.log('%c[uBlock Engine] 🛡️ Pruned ytInitialPlayerResponse ads payload', 'color: #4caf50; font-weight: bold;');
             incrementBlockedCount();
           }
         } else {
@@ -380,7 +399,7 @@
       host.style.position = 'fixed';
       host.style.top = '0';
       host.style.right = '0';
-      host.style.zIndex = '2147483647';
+      host.style.zIndex = '1001';
       host.style.pointerEvents = 'none';
 
       const shadow = host.attachShadow({ mode: 'open' });
@@ -391,7 +410,7 @@
         .badge {
           position: fixed;
           top: 14px;
-          right: 75px;
+          right: 130px;
           display: inline-flex;
           align-items: center;
           gap: 6px;
@@ -475,9 +494,12 @@
 
       shadow.appendChild(badgeElem);
       root.appendChild(host);
-      console.log('%c[uBlock Engine] 🛡️ Shadow DOM Badge attached to documentElement', 'color: #4caf50; font-weight: bold;');
+      updateBadgePosition();
     } else if (!root.contains(host)) {
       root.appendChild(host);
+      updateBadgePosition();
+    } else {
+      updateBadgePosition();
     }
   }
 
@@ -486,13 +508,17 @@
     patchYtcfg();
     injectStyles();
     ensureBadgeInDOM();
+    updateBadgePosition();
     handleDomAds();
+
+    window.addEventListener('resize', updateBadgePosition, { passive: true });
 
     const observer = new MutationObserver(() => {
       patchYtcfg();
       handleDomAds();
       injectStyles();
       ensureBadgeInDOM();
+      updateBadgePosition();
     });
 
     observer.observe(document.documentElement, {
@@ -506,6 +532,7 @@
       patchYtcfg();
       handleDomAds();
       ensureBadgeInDOM();
+      updateBadgePosition();
     }, 300);
   }
 
